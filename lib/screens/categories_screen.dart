@@ -75,12 +75,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     backgroundColor: color,
                     radius: 20,
                     child: _selectedColor.value == color.value
-                        ? Icon(
-                            Icons.check,
-                            size: 18,
-                            color: color.computeLuminance() > 0.5
+                        ? CircleAvatar(
+                            radius: 9,
+                            backgroundColor: color.computeLuminance() > 0.5
                                 ? Colors.black
                                 : Colors.white,
+                            child: Icon(Icons.check, size: 12, color: color),
                           )
                         : null,
                   ),
