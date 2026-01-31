@@ -42,99 +42,100 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(context).cardColor,
-        title: const Text("Add Category"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Category name input
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: "Name",
-                hintText: "e.g., Work, Personal, etc.",
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
+          title: const Text("Add Category"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Category name input
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: "Name",
+                  hintText: "e.g., Work, Personal, etc.",
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // Color picker
-            const Text(
-              "Choose Color:",
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 10,
-              children: _availableColors.map((color) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() => _selectedColor = color);
-                  },
-                  child: CircleAvatar(
-                    backgroundColor: color,
-                    radius: 20,
-                    child: _selectedColor.value == color.value
-                        ? CircleAvatar(
-                            radius: 9,
-                            backgroundColor: color.computeLuminance() > 0.5
-                                ? Colors.black
-                                : Colors.white,
-                            child: Icon(Icons.check, size: 12, color: color),
-                          )
-                        : null,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text("Cancel"),
+              // Color picker
+              const Text(
+                "Choose Color:",
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 10,
+                children: _availableColors.map((color) {
+                  return GestureDetector(
+                    onTap: () {
+                      setDialogState(() => _selectedColor = color);
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: color,
+                      radius: 20,
+                      child: _selectedColor.value == color.value
+                          ? Icon(
+                              Icons.check_circle,
+                              size: 28,
+                              color: color.computeLuminance() > 0.5
+                                  ? Colors.black
+                                  : Colors.white,
+                            )
+                          : null,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              // Validate name
-              if (_nameController.text.trim().isEmpty) {
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_nameController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Enter category name!'),
+                      backgroundColor: Colors.redAccent,
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  return;
+                }
+
+                // for new category
+                final newCat = TaskCategory(
+                  id: DateTime.now().toString(),
+                  name: _nameController.text.trim(),
+                  colorValue: _selectedColor.value,
+                );
+
+                // Add category and save
+                widget.categories.add(newCat);
+                _storage.saveCategories(widget.categories);
+                Navigator.of(ctx).pop();
+
+                // Show success message
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Enter category name!'),
-                    backgroundColor: Colors.redAccent,
-                    duration: Duration(seconds: 2),
+                  SnackBar(
+                    content: Text('"${newCat.name}" category added'),
+                    duration: const Duration(seconds: 2),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
-                return;
-              }
 
-              // for new category
-              final newCat = TaskCategory(
-                id: DateTime.now().toString(),
-                name: _nameController.text.trim(),
-                colorValue: _selectedColor.value,
-              );
-
-              // Add category and save
-              widget.categories.add(newCat);
-              _storage.saveCategories(widget.categories);
-              Navigator.of(ctx).pop();
-
-              // Show success message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('"${newCat.name}" category added'),
-                  duration: const Duration(seconds: 2),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-
-              setState(() {}); // Refresh UI
-            },
-            child: const Text("Add"),
-          ),
-        ],
+                setState(() {});
+              },
+              child: const Text("Add"),
+            ),
+          ],
+        ),
       ),
     );
   }
