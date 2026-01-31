@@ -74,8 +74,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   child: CircleAvatar(
                     backgroundColor: color,
                     radius: 20,
-                    child: _selectedColor == color
-                        ? const Icon(Icons.check, size: 18, color: Colors.white)
+                    child: _selectedColor.value == color.value
+                        ? Icon(
+                            Icons.check,
+                            size: 18,
+                            color: color.computeLuminance() > 0.5
+                                ? Colors.black
+                                : Colors.white,
+                          )
                         : null,
                   ),
                 );
@@ -107,7 +113,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               final newCat = TaskCategory(
                 id: DateTime.now().toString(),
                 name: _nameController.text.trim(),
-                colorValue: _selectedColor.toARGB32(),
+                colorValue: _selectedColor.value,
               );
 
               // Add category and save
