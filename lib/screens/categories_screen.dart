@@ -36,7 +36,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   /// Adds a new category
   void _addCategory() {
-    // Reset form
     _nameController.clear();
     _selectedColor = Colors.blueAccent;
 
@@ -49,7 +48,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Category name input
               TextField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -59,7 +57,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Color picker
               const Text(
                 "Choose Color:",
                 style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -162,7 +159,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               });
               Navigator.of(ctx).pop();
 
-              // Show success message
+              // Shows deletion message
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('"$categoryName" deleted'),

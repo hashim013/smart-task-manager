@@ -128,13 +128,12 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  /// Deletes a task with undo option via snackbar (auto-dismisses after 4 seconds)
+  /// Deletes a task with UNDO option
   void _deleteTask(Task task) {
     final deletedIndex = _allTasks.indexOf(task);
 
     scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
 
-    // Show snackbar with UNDO action
     final snackBarController = scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text("Deleted '${task.title}'"),
@@ -244,7 +243,7 @@ class HomeScreenState extends State<HomeScreen> {
                     itemCount: _filteredTasks.length,
                     itemBuilder: (ctx, i) {
                       final task = _filteredTasks[i];
-                      // Safely get category (may be null if no category assigned)
+                      // Get category for the task
                       final cat = task.categoryId != null
                           ? _getCategory(task.categoryId!)
                           : null;

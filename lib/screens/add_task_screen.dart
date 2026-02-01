@@ -6,7 +6,7 @@ import 'categories_screen.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final List<TaskCategory> categories;
-  final Task? task; // null if creating new task, otherwise editing
+  final Task? task; // Null if adding new task
 
   const AddTaskScreen({super.key, required this.categories, this.task});
 
@@ -37,7 +37,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  /// Clean up resources when screen is destroyed
+  /// Clean up controllers
   @override
   void dispose() {
     _titleController.dispose();
@@ -73,7 +73,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         return;
       }
 
-      // Create task object
+      // Create new or updated task
       final newTask = Task(
         id: widget.task?.id ?? DateTime.now().toString(),
         title: _titleController.text.trim(),
@@ -84,7 +84,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         isCompleted: widget.task?.isCompleted ?? false,
       );
 
-      // Return new/updated task to previous screen
+      // Return new task to previous screen
       Navigator.of(
         context,
       ).pop({'task': newTask, 'categories': widget.categories});
@@ -111,7 +111,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     setState(() {}); // Refresh UI in case categories changed
   }
 
-  /// color based on priority level
+  /// Returns color based on priority
   Color _getPriorityColor(String priority) {
     switch (priority) {
       case 'High':
