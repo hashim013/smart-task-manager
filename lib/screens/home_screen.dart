@@ -5,6 +5,8 @@ import 'package:smart_task_manager/main.dart';
 import '../models/task.dart';
 import '../models/category_model.dart';
 import '../services/storage_service.dart';
+import '../utils/constants.dart';
+import '../utils/helpers.dart';
 import 'add_task_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,6 +17,9 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => HomeScreenState();
 }
+
+/// Home Screen
+/// Displays all tasks, handles search, delete, and navigation
 
 class HomeScreenState extends State<HomeScreen> {
   final StorageService _storage = StorageService();
@@ -56,9 +61,9 @@ class HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text('Error loading data: $e'),
-            backgroundColor: Colors.redAccent,
-            duration: const Duration(seconds: 3),
+            content: Text('${AppStrings.errorLoadingData}$e'),
+            backgroundColor: AppColors.error,
+            duration: AppDurations.snackBarDuration,
           ),
         );
       }
@@ -67,22 +72,11 @@ class HomeScreenState extends State<HomeScreen> {
 
   void _sortTasks() {
     _filteredTasks.sort((a, b) {
-      int rankA = _getPriorityRank(a.priority);
-      int rankB = _getPriorityRank(b.priority);
+      int rankA = AppHelpers.getPriorityRank(a.priority);
+      int rankB = AppHelpers.getPriorityRank(b.priority);
       if (rankA != rankB) return rankA.compareTo(rankB);
       return a.date.compareTo(b.date);
     });
-  }
-
-  int _getPriorityRank(String priority) {
-    switch (priority) {
-      case 'High':
-        return 0;
-      case 'Medium':
-        return 1;
-      default:
-        return 2;
-    }
   }
 
   void _runFilter(String keyword) {
@@ -98,12 +92,12 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// Saves all tasks and categories to local storage
   void _saveAll() {
     _storage.saveTasks(_allTasks);
     _storage.saveCategories(_categories);
   }
 
-  /// Opens the Add/Edit Task screen
   void _openTaskForm({Task? task}) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -114,10 +108,8 @@ class HomeScreenState extends State<HomeScreen> {
     if (result != null) {
       setState(() {
         if (task == null) {
-          // Adding new task
           _allTasks.add(result['task']);
         } else {
-          // Editing existing task
           final index = _allTasks.indexWhere((t) => t.id == task.id);
           if (index != -1) _allTasks[index] = result['task'];
         }
@@ -136,11 +128,11 @@ class HomeScreenState extends State<HomeScreen> {
 
     final snackBarController = scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
-        content: Text("Deleted '${task.title}'"),
+        content: Text("${AppStrings.deleted} '${task.title}'"),
         behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.horizontal,
         action: SnackBarAction(
-          label: 'UNDO',
+          label: AppStrings.undo,
           onPressed: () {
             setState(() {
               _allTasks.insert(deletedIndex, task);
@@ -152,8 +144,8 @@ class HomeScreenState extends State<HomeScreen> {
       ),
     );
 
-    // Auto-dismiss snackbar after 4 seconds
-    Future.delayed(const Duration(seconds: 4), () {
+    // Auto-dismiss snackbar
+    Future.delayed(AppDurations.autoCloseDuration, () {
       try {
         snackBarController?.close();
       } catch (e) {}
@@ -166,7 +158,6 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  /// category by ID, returns null if not found
   TaskCategory? _getCategory(String id) {
     if (_categories.isEmpty) return null;
     try {
@@ -176,16 +167,8 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  /// color for priority level
   Color _getPriorityColor(String priority) {
-    switch (priority) {
-      case 'High':
-        return Colors.redAccent;
-      case 'Medium':
-        return Colors.yellowAccent;
-      default:
-        return Colors.greenAccent;
-    }
+    return AppHelpers.getPriorityColor(priority);
   }
 
   @override
@@ -195,7 +178,7 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-          "TASKS",
+          AppStrings.tasksTitle,
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2),
         ),
         actions: [
@@ -213,7 +196,7 @@ class HomeScreenState extends State<HomeScreen> {
               controller: _searchController,
               onChanged: _runFilter,
               decoration: InputDecoration(
-                hintText: "Search tasks...",
+                hintText: AppStrings.searchHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -237,7 +220,7 @@ class HomeScreenState extends State<HomeScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredTasks.isEmpty
-                ? const Center(child: Text("No tasks found!"))
+                ? const Center(child: Text(AppStrings.noTasksFound))
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     itemCount: _filteredTasks.length,
@@ -264,10 +247,9 @@ class HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         child: ListTile(
-                          onTap: () => _openTaskForm(task: task),
                           leading: Checkbox(
                             value: task.isCompleted,
-                            activeColor: Colors.blueAccent,
+                            activeColor: AppColors.primary,
                             onChanged: (val) => setState(() {
                               task.isCompleted = val!;
                               _saveAll();
@@ -319,7 +301,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ],
                                   Text(
                                     isToday
-                                        ? "Today"
+                                        ? AppStrings.today
                                         : DateFormat.MMMd().format(task.date),
                                     style: TextStyle(
                                       fontSize: 12,
@@ -330,9 +312,29 @@ class HomeScreenState extends State<HomeScreen> {
                               ),
                             ],
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.grey),
-                            onPressed: () => _deleteTask(task),
+                          trailing: SizedBox(
+                            width: 100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: AppColors.primary,
+                                  ),
+                                  tooltip: AppStrings.editTask,
+                                  onPressed: () => _openTaskForm(task: task),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: AppColors.error,
+                                  ),
+                                  tooltip: AppStrings.deleteTask,
+                                  onPressed: () => _deleteTask(task),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -343,7 +345,7 @@ class HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openTaskForm(),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: AppColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );

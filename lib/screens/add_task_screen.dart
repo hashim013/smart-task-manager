@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/task.dart';
 import '../models/category_model.dart';
+import '../utils/constants.dart';
+import '../utils/helpers.dart';
 import 'categories_screen.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final List<TaskCategory> categories;
-  final Task? task; // Null if adding new task
+  final Task? task;
 
   const AddTaskScreen({super.key, required this.categories, this.task});
 
@@ -15,11 +17,9 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-  // Form controllers
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
 
-  // Form state
   String? _selectedCategoryId;
   String _selectedPriority = 'Low';
   DateTime _selectedDate = DateTime.now();
@@ -27,7 +27,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   void initState() {
     super.initState();
-    // If editing existing task, pre-fill form fields
     if (widget.task != null) {
       _titleController.text = widget.task!.title;
       _descController.text = widget.task!.description;
@@ -37,7 +36,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  /// Clean up controllers
   @override
   void dispose() {
     _titleController.dispose();
@@ -45,7 +43,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     super.dispose();
   }
 
-  /// date picker to select due date
+  /// date picker
   void _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -58,22 +56,14 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     if (picked != null) setState(() => _selectedDate = picked);
   }
 
-  /// Validates and saves the task
   void _save() {
     try {
       if (_titleController.text.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Task name cannot be empty!'),
-            backgroundColor: Colors.redAccent,
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppHelpers.showError(context, AppStrings.taskNameEmpty);
         return;
       }
 
-      // Create new or updated task
+      // new or updated task
       final newTask = Task(
         id: widget.task?.id ?? DateTime.now().toString(),
         title: _titleController.text.trim(),
@@ -84,63 +74,48 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         isCompleted: widget.task?.isCompleted ?? false,
       );
 
-      // Return new task to previous screen
+      // Return new/updated task with categories
       Navigator.of(
         context,
       ).pop({'task': newTask, 'categories': widget.categories});
     } catch (e) {
-      // Show error message if saving fails
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error saving task: $e'),
-          backgroundColor: Colors.redAccent,
-          duration: const Duration(seconds: 3),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppHelpers.showError(context, '${AppStrings.errorSavingTask}$e');
     }
   }
 
-  /// Opens category management screen
   void _openCategoryManager() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CategoriesScreen(categories: widget.categories),
       ),
     );
-    setState(() {}); // Refresh UI in case categories changed
-  }
-
-  /// Returns color based on priority
-  Color _getPriorityColor(String priority) {
-    switch (priority) {
-      case 'High':
-        return Colors.redAccent;
-      case 'Medium':
-        return Colors.yellow;
-      default:
-        return Colors.greenAccent;
-    }
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.task != null;
     return Scaffold(
-      appBar: AppBar(title: Text(isEdit ? "EDIT TASK" : "ADD TASK")),
+      appBar: AppBar(
+        title: Text(isEdit ? AppStrings.editTaskTitle : AppStrings.addTask),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildCustomTextField(_titleController, "Task Name"),
+            _buildCustomTextField(_titleController, AppStrings.taskName),
             const SizedBox(height: 15),
 
-            _buildCustomTextField(_descController, "Description", maxLines: 3),
+            _buildCustomTextField(
+              _descController,
+              AppStrings.description,
+              maxLines: 3,
+            ),
             const SizedBox(height: 25),
 
             const Text(
-              "Category",
+              AppStrings.category,
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
             const SizedBox(height: 5),
@@ -157,13 +132,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       child: DropdownButton<String>(
                         isExpanded: true,
                         value: _selectedCategoryId,
-                        hint: const Text("No Category"),
+                        hint: const Text(AppStrings.noCategory),
                         dropdownColor: Theme.of(context).cardColor,
                         items: [
                           const DropdownMenuItem<String>(
                             value: null,
                             child: Text(
-                              "No Category",
+                              AppStrings.noCategory,
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -183,7 +158,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     ),
                   ),
                 ),
-                // Button to manage categories
+
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: _openCategoryManager,
@@ -193,7 +168,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
             const SizedBox(height: 15),
 
-            // Due date picker
             GestureDetector(
               onTap: _pickDate,
               child: Container(
@@ -205,7 +179,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 child: Row(
                   children: [
                     const Text(
-                      "Due Date:",
+                      AppStrings.dueDate,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
@@ -219,9 +193,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
             const SizedBox(height: 15),
 
-            // Priority selection
             const Text(
-              "Priority",
+              AppStrings.priority,
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 5),
@@ -236,13 +209,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   isExpanded: true,
                   value: _selectedPriority,
                   dropdownColor: Theme.of(context).cardColor,
-                  items: ['Low', 'Medium', 'High']
+                  items: PriorityLevels.all
                       .map(
                         (p) => DropdownMenuItem(
                           value: p,
                           child: Text(
                             p,
-                            style: TextStyle(color: _getPriorityColor(p)),
+                            style: TextStyle(
+                              color: AppHelpers.getPriorityColor(p),
+                            ),
                           ),
                         ),
                       )
@@ -254,18 +229,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
             const SizedBox(height: 40),
 
-            // Save and Cancel buttons
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
                     onPressed: _save,
                     child: Text(
-                      isEdit ? "UPDATE" : "SAVE",
+                      isEdit ? AppStrings.update : AppStrings.save,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -277,12 +251,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
+                      backgroundColor: AppColors.error,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text(
-                      "CANCEL",
+                      AppStrings.cancel,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -298,7 +272,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 
-  /// Custom styled text field
   Widget _buildCustomTextField(
     TextEditingController controller,
     String label, {

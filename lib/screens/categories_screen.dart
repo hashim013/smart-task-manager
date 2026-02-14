@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import '../services/storage_service.dart';
+import '../utils/constants.dart';
+import '../utils/helpers.dart';
 
 class CategoriesScreen extends StatefulWidget {
   final List<TaskCategory> categories;
@@ -14,19 +16,17 @@ class CategoriesScreen extends StatefulWidget {
 class _CategoriesScreenState extends State<CategoriesScreen> {
   final StorageService _storage = StorageService();
 
-  // Controller for category name input
   final _nameController = TextEditingController();
 
-  // Available colors for categories
   final List<Color> _availableColors = [
-    Colors.redAccent,
-    Colors.blueAccent,
-    Colors.greenAccent,
+    AppColors.highPriority,
+    AppColors.primary,
+    AppColors.lowPriority,
     Colors.deepPurple,
     Colors.teal,
     Colors.cyan,
   ];
-  Color _selectedColor = Colors.blueAccent;
+  Color _selectedColor = AppColors.primary;
 
   @override
   void dispose() {
@@ -37,28 +37,28 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   /// Adds a new category
   void _addCategory() {
     _nameController.clear();
-    _selectedColor = Colors.blueAccent;
+    _selectedColor = AppColors.primary;
 
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: Theme.of(context).cardColor,
-          title: const Text("Add Category"),
+          title: const Text(AppStrings.addCategory),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: "Name",
-                  hintText: "e.g., Work, Personal, etc.",
+                  labelText: AppStrings.categoryName,
+                  hintText: AppStrings.categoryHint,
                 ),
               ),
               const SizedBox(height: 20),
 
               const Text(
-                "Choose Color:",
+                AppStrings.chooseColor,
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 10),
@@ -90,46 +90,37 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text("Cancel"),
+              child: const Text(AppStrings.cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 if (_nameController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Enter category name!'),
-                      backgroundColor: Colors.redAccent,
-                      duration: Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                    ),
+                  AppHelpers.showError(
+                    context,
+                    AppStrings.enterCategoryName,
+                    duration: const Duration(seconds: 2),
                   );
                   return;
                 }
 
-                // for new category
                 final newCat = TaskCategory(
                   id: DateTime.now().toString(),
                   name: _nameController.text.trim(),
                   colorValue: _selectedColor.value,
                 );
 
-                // Add category and save
                 widget.categories.add(newCat);
                 _storage.saveCategories(widget.categories);
                 Navigator.of(ctx).pop();
 
-                // Show success message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('"${newCat.name}" category added'),
-                    duration: const Duration(seconds: 2),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                AppHelpers.showSuccess(
+                  context,
+                  '"${newCat.name}" ${AppStrings.categoryAdded}',
                 );
 
                 setState(() {});
               },
-              child: const Text("Add"),
+              child: const Text(AppStrings.addCategory),
             ),
           ],
         ),
@@ -137,19 +128,21 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  /// Deletes a category
+  /// Delete a category
   void _deleteCategory(int index) {
     final categoryName = widget.categories[index].name;
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Delete Category?"),
-        content: Text('Remove "$categoryName" category?'),
+        title: const Text(AppStrings.deleteCategory),
+        content: Text(
+          '${AppStrings.deleteCategoryConfirm} "$categoryName" ${AppStrings.category.toLowerCase()}?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text("Cancel"),
+            child: const Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -160,15 +153,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               Navigator.of(ctx).pop();
 
               // Shows deletion message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('"$categoryName" deleted'),
-                  duration: const Duration(seconds: 2),
-                  behavior: SnackBarBehavior.floating,
-                ),
+              AppHelpers.showSuccess(
+                context,
+                '"$categoryName" ${AppStrings.categoryDeleted}',
               );
             },
-            child: const Text("Delete"),
+            child: const Text(AppStrings.deleteCategoryConfirm),
           ),
         ],
       ),
@@ -178,11 +168,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Categories"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppStrings.editCategories),
+        centerTitle: true,
+      ),
       body: widget.categories.isEmpty
           ? const Center(
               child: Text(
-                "No categories yet.\nCreate your first one!",
+                AppStrings.noCategoriesYet,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),
@@ -204,7 +197,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addCategory,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: AppColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );

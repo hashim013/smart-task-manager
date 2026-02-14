@@ -1,31 +1,53 @@
+# 📱 Smart Task Manager – Flutter App
 
-# 📌 Smart Task Manager (Flutter)
+A clean, modern, and beginner-friendly **Task Management Flutter application** that helps users organize daily tasks with categories, priorities, and persistent local storage.
 
-A simple, clean, and beginner-friendly **Flutter Todo Application** that helps users manage daily tasks with categories, priorities, and local storage support.
-
-This project focuses on **stability, good UX, and clean architecture**, making it suitable for students and new Flutter developers.
+Built with focus on **clean architecture, good UI/UX, and stability** — perfect for students and Flutter learners.
 
 ---
 
 ## 🚀 Features
 
-* ✅ Add, edit, and delete tasks
-* ✅ Assign categories with custom colors
-* ✅ Set priority levels (Low, Medium, High)
-* ✅ Select due dates
-* ✅ Mark tasks as completed
-* ✅ Search tasks instantly
-* ✅ Undo delete using SnackBar
-* ✅ Dark & Light theme support
-* ✅ Splash screen with fallback image
-* ✅ Local data storage using SharedPreferences
-* ✅ Input validation & error handling
+### 📝 Task Management
+
+* Add, edit, and delete tasks
+* Mark tasks as completed
+* Instant task search
+* Set due dates
+* Undo delete with SnackBar
+
+### 🗂️ Organization
+
+* Create custom categories
+* Assign colors to categories
+* Filter tasks easily
+
+### 🔥 Priority System
+
+* 🔴 High priority
+* 🟠 Medium priority
+* 🟢 Low priority
+
+### 🎨 UI & Theme
+
+* Dark & Light mode
+* Theme persistence
+* Splash screen (theme supported)
+* Clean Material UI
+
+### 💾 Storage
+
+* Local storage using SharedPreferences
+* Works completely offline
+* Data persists after restart
 
 ---
 
-## 📱 App Preview
+## 📸 App Flow
 
-> The app starts with a splash screen, then opens the task dashboard where users can manage their tasks easily.
+```
+Splash Screen → Home Screen → Add/Edit Task → Save → Local Storage
+```
 
 ---
 
@@ -46,85 +68,47 @@ lib/
 │   ├── add_task_screen.dart
 │   └── categories_screen.dart
 │
-└── services/
-    └── storage_service.dart
+├── services/
+│   └── storage_service.dart
+│
+└── utils/
+    ├── theme.dart
+    ├── constants.dart
+    └── helpers.dart
 ```
 
-### Folder Description
+### 📌 Detailed Folder Explanation
 
-| Folder    | Purpose                              |
-| --------- | ------------------------------------ |
-| models    | Data models for tasks and categories |
-| screens   | UI screens of the application        |
-| services  | Handles data storage and retrieval   |
-| main.dart | App entry point & theme management   |
+👉 See: **docs/Folder_Structure.md**
 
 ---
 
 ## 🛠️ Technologies Used
 
-* Flutter (Material Design)
+* Flutter
 * Dart
-* SharedPreferences (Local Storage)
-* Intl (Date Formatting)
+* Material Design
+* SharedPreferences
+* Intl
 
 ---
 
-## 📂 Data Storage
+## ⚙️ Installation
 
-This app uses **SharedPreferences** to store data locally.
-
-* Tasks and categories are converted into JSON format
-* Stored using keys
-* Loaded on app startup
-* Automatically saved on changes
-
-Example:
-
-```dart
-jsonEncode(tasks.map((t) => t.toMap()).toList());
-```
-
----
-
-## ⚙️ Installation & Setup
-
-### Prerequisites
-
-* Flutter SDK installed
-* Android Studio / VS Code
-* Android Emulator or Physical Device
-
----
-
-### Steps
-
-1️⃣ Clone the repository
+### 1️⃣ Clone repository
 
 ```bash
 git clone https://github.com/your-username/smart-task-manager.git
-```
-
-2️⃣ Navigate to project folder
-
-```bash
 cd smart-task-manager
 ```
 
-3️⃣ Clean and get dependencies
+### 2️⃣ Install dependencies
 
 ```bash
-flutter clean
 flutter pub get
 ```
 
-4️⃣ Analyze project
-
-```bash
-flutter analyze
-```
-
-5️⃣ Run the app
+### 3️⃣ Run app
 
 ```bash
 flutter run
@@ -132,97 +116,81 @@ flutter run
 
 ---
 
-## 🧪 Testing & Validation
+## 🧠 Key Concepts Used
 
-The app includes built-in validation and error handling:
-
-✔ Empty task title handling
-✔ Safe null checks for categories
-✔ Try-catch blocks for storage
-✔ Snackbar feedback
-✔ Controller disposal
-
-Test cases:
-
-* Create task without category → No crash
-* Delete task → Undo appears
-* Restart app → Data persists
-* Empty input → Validation shown
-
----
-
-## 🧠 Key Logic
-
-### Home Screen
-
-* Loads tasks & categories
-* Handles filtering & sorting
-* Manages deletion & undo
-
-### Add Task Screen
-
+* StatefulWidget state management
+* Theme switching
+* Local storage with SharedPreferences
 * Form validation
-* Date picker
-* Priority selector
-* Category manager
-
-### Storage Service
-
-* Converts data to JSON
-* Saves to SharedPreferences
-* Loads on startup
+* SnackBar with undo
+* Clean architecture
+* Null-safe Flutter development
 
 ---
 
-## ⚠️ Challenges Faced & Solutions
+## 🧪 Stability & Error Handling
 
-| Challenge           | Solution                 |
-| ------------------- | ------------------------ |
-| Null-safety crash   | Added safe null checks   |
-| Snackbar stuck      | Added duration & control |
-| App crashes on load | Added try-catch          |
-| Memory leaks        | Disposed controllers     |
-| Image loading error | Added fallback icon      |
+Handled common real-world issues:
+
+| Issue               | Fix                           |
+| ------------------- | ----------------------------- |
+| Snackbar stuck      | Used global ScaffoldMessenger |
+| Null category crash | Added fallback category       |
+| Theme not updating  | Managed theme in main.dart    |
+| Memory leaks        | Disposed controllers          |
+| UI rebuild issues   | Optimized setState usage      |
 
 ---
 
 ## 👨‍💻 Why This Project?
 
-This project was developed as a task assigned during the ITSOLERA Winter Internship 2026 (Mobile App Development).
+This project was developed as part of the **ITSOLERA Winter Internship 2026 (Mobile App Development)**.
 
-The main purpose of this project was to:
+The main purpose of building this application was to:
 
 * Apply Flutter concepts in a real-world application
 * Practice mobile app development using Dart and Material UI
-* Learn proper project structure and state management
+* Learn proper project structure and basic state management
 * Implement local data storage using SharedPreferences
 * Improve debugging and problem-solving skills
 * Understand null-safety and error handling in Flutter
 
-Through this internship task, I gained hands-on experience in building a complete, stable, and user-friendly mobile application.
+Through this internship task, I gained hands-on experience in building a complete, stable, and user-friendly mobile application while following clean coding practices and structured development.
 
 ---
 
-## 🌟 Future Improvements
+## 💡 Challenges Faced
 
-* Cloud backup (Firebase)
+| Problem                   | Solution                 |
+| ------------------------- | ------------------------ |
+| Snackbar not disappearing | Global ScaffoldMessenger |
+| Null crash on category    | Default fallback         |
+| Theme issues              | Central theme controller |
+| State bugs                | Proper setState usage    |
+
+---
+
+## 🔮 Future Improvements
+
+* Firebase cloud backup
+* Notifications & reminders
 * User authentication
-* Task reminders
-* Push notifications
+* Cloud sync
 * Analytics dashboard
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome!
+This project was built for learning and internship practice,  
+but suggestions and improvements are welcome.
 
-If you want to improve this project:
+If you'd like to contribute:
 
-1. Fork the repo
-2. Create a new branch
-3. Make changes
-4. Submit a pull request
+1. Fork the repository  
+2. Create a new branch  
+3. Make your changes  
+4. Submit a pull request 
 
 ---
 
@@ -248,4 +216,3 @@ If you like this project:
 🌟 Star the repository
 🍴 Fork it
 📢 Share with others
-

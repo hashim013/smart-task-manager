@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -48,13 +49,13 @@ class _SplashScreenState extends State<SplashScreen> {
                   return const Icon(
                     Icons.task_alt,
                     size: 100,
-                    color: Colors.blueAccent,
+                    color: AppColors.primary,
                   );
                 },
               ),
             ),
             const SizedBox(height: 30),
-            const CircularProgressIndicator(color: Colors.blueAccent),
+            const CircularProgressIndicator(color: AppColors.primary),
           ],
         ),
       ),
