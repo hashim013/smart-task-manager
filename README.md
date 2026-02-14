@@ -79,7 +79,8 @@ lib/
 
 ### 📌 Detailed Folder Explanation
 
-👉 See: **docs/Folder_Structure.md**
+For detailed folder explanation:
+👉 See: (docs/FOLDER_STRUCTURE.md) 
 
 ---
 
