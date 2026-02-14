@@ -80,7 +80,7 @@ lib/
 ### 📌 Detailed Folder Explanation
 
 For detailed folder explanation:
-👉 See: [View Full Folder Structure](docs/FOLDER_STRUCTURE.md) 
+👉 See: [View Full Folder Structure](docs/Folder_Structure.md) 
 
 ---
 
